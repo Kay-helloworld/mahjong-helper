@@ -1,0 +1,390 @@
+:root {
+    --bg-primary: #123524;
+    /* 深綠色麻將桌布 */
+    --accent-gold: #FFD700;
+    --accent-red: #D32F2F;
+    --accent-blue: #1976D2;
+    --text-light: #EEE;
+    --tile-bg: #FFF;
+    --tile-shadow: 1px 1px 0 #CCC, 2px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: system-ui, -apple-system, "Microsoft JhengHei", sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-light);
+    height: 100vh;
+    overflow: hidden;
+    /* 防止滾動 */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 頂部資訊 */
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    align-items: center;
+}
+
+.info-badge {
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.highlight {
+    color: var(--accent-gold);
+    font-weight: bold;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: white;
+}
+
+/* 中央區域 (對手與河) */
+.opponents-area {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 8px;
+    padding: 8px;
+    position: relative;
+    /* 這裡可以根據實際畫面調整高度比例 */
+    max-height: 40vh;
+}
+
+.opponent {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.opponent.top {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: center;
+}
+
+.opponent.left {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.opponent.right {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.avatar {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-bottom: 2px;
+}
+
+.river {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    min-height: 20px;
+    /* 對手的河牌稍微小一點 */
+}
+
+.small-tile {
+    width: 30px;
+    height: 40px;
+    background: var(--tile-bg);
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    /* 加大字體 */
+    font-weight: bold;
+    color: #333;
+    border: 1px solid #999;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* 雙軌決策 (核心) */
+.decision-hud {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    margin: 0 8px;
+    border-radius: 8px;
+}
+
+.hud-panel {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+}
+
+.hud-panel.defense {
+    background: rgba(56, 142, 60, 0.2);
+    border: 1px solid rgba(56, 142, 60, 0.5);
+}
+
+.hud-panel.offense {
+    background: rgba(211, 47, 47, 0.2);
+    border: 1px solid rgba(211, 47, 47, 0.5);
+}
+
+.hud-title {
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: var(--accent-gold);
+}
+
+.hud-content {
+    font-size: 0.8rem;
+    min-height: 30px;
+}
+
+.recommendation-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.rec-rank {
+    color: var(--accent-gold);
+    font-weight: bold;
+    margin-right: 6px;
+}
+
+.rec-prob {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+/* 玩家區域 */
+.player-area {
+    padding: 8px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.hand-area {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0;
+    min-height: 60px;
+}
+
+.hand-tiles {
+    display: flex;
+    gap: 2px;
+}
+
+.my-tile {
+    width: 32px;
+    height: 44px;
+    background: var(--tile-bg);
+    border-radius: 4px;
+    box-shadow: var(--tile-shadow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.1s;
+}
+
+.my-tile:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+.my-tile.selected {
+    transform: translateY(-8px);
+    border: 2px solid var(--accent-gold);
+}
+
+/* 底部操作面板 */
+.control-panel {
+    background: #fff;
+    color: #333;
+    border-radius: 16px 16px 0 0;
+    padding: 12px;
+    padding-bottom: 24px;
+    /* iPhone bar spacing */
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.mode-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background: #f0f0f0;
+    font-weight: bold;
+    color: #666;
+}
+
+.tab-btn.active {
+    background: var(--bg-primary);
+    /* Use dark green */
+    color: white;
+}
+
+.mahjong-keyboard {
+    display: grid;
+    gap: 4px;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: 4px;
+}
+
+.tile-btn {
+    flex: 1;
+    height: 36px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 4px;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 0 #ddd;
+}
+
+.tile-btn:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.suit-label {
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.action-buttons {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    /* 避免按鈕過多換行 */
+}
+
+.undo-btn {
+    padding: 8px 12px;
+    border: 1px solid #ffcdd2;
+    background: #ffebee;
+    color: #c62828;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.func-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.func-btn#drawBtn {
+    background: var(--accent-gold);
+    color: #123524;
+    /* 深綠字 */
+}
+
+.player-select-btn {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    border-radius: 6px;
+}
+
+.player-select-btn.selected {
+    background: var(--bg-primary);
+    color: white;
+    border-color: var(--bg-primary);
+}
+
+/* 隱藏 */
+.hidden {
+    display: none;
+}
+
+.action-group {
+    display: none;
+    margin-left: auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-group.show {
+    display: flex;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    color: #333;
+    min-width: 280px;
+}
+
+.modal.active {
+    display: flex;
+}

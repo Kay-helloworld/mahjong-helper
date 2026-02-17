@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>麻將戰情室</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="mahjong-table">
+        <!-- 頂部資訊列 -->
+        <header class="table-header">
+            <div class="info-badge">
+                <span>剩餘牌牆:</span>
+                <span id="wallCount" class="highlight">144</span>
+            </div>
+            <div class="info-badge">
+                <span id="windRound">東風圈</span>
+            </div>
+            <button id="resetBtn" class="icon-btn">🔄</button>
+            <button id="settingsBtn" class="icon-btn">⚙️</button>
+        </header>
+
+        <!-- 對手區域 (上/對/下) -->
+        <div class="opponents-area">
+            <!-- 上家 (左) -->
+            <div class="opponent left" id="player-3">
+                <div class="avatar">上家</div>
+                <div class="river" id="river-3"></div>
+                <div class="melds" id="melds-3"></div>
+            </div>
+
+            <!-- 對家 (中) -->
+            <div class="opponent top" id="player-2">
+                <div class="avatar">對家</div>
+                <div class="river" id="river-2"></div>
+                <div class="melds" id="melds-2"></div>
+            </div>
+
+            <!-- 下家 (右) -->
+            <div class="opponent right" id="player-1">
+                <div class="avatar">下家</div>
+                <div class="river" id="river-1"></div>
+                <div class="melds" id="melds-1"></div>
+            </div>
+        </div>
+
+        <!-- 決策建議 HUD (核心功能) -->
+        <div class="decision-hud">
+            <!-- 防守建議 -->
+            <div class="hud-panel defense">
+                <div class="hud-title">🛡️ 防守建議 (安全牌)</div>
+                <div class="hud-content" id="defense-recommendation">
+                    <div class="placeholder-text">等待局勢變化...</div>
+                </div>
+            </div>
+
+            <!-- 進攻建議 -->
+            <div class="hud-panel offense">
+                <div class="hud-title">⚔️ 進攻建議 (牌效)</div>
+                <div class="hud-content" id="offense-recommendation">
+                    <div class="placeholder-text">請先建立手牌...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 玩家區域 (底部) -->
+        <div class="player-area" id="player-0">
+            <!-- 自己的捨牌區 (河) -->
+            <div class="river self" id="river-0"></div>
+
+            <!-- 操作提示 -->
+            <div class="action-hint" id="actionHint">請建立起始手牌 (點擊下方鍵盤)</div>
+
+            <!-- 手牌區 -->
+            <div class="hand-area">
+                <div class="hand-tiles" id="myHand">
+                    <!-- 手牌會動態生成在這裡 -->
+                </div>
+                <!-- 剛摸到的牌 -->
+                <div class="drawn-tile hidden" id="drawnTile"></div>
+            </div>
+
+            <!-- 吃碰槓區 -->
+            <div class="melds self" id="melds-0"></div>
+        </div>
+
+        <!-- 操作控制台 (鍵盤) -->
+        <div class="control-panel" id="controlPanel">
+            <!-- 模式切換標籤 -->
+            <div class="mode-tabs">
+                <button class="tab-btn active" data-mode="record">📝 紀錄場上 (對手)</button>
+                <button class="tab-btn" data-mode="hand">🖐️ 編輯手牌 (自己)</button>
+            </div>
+
+            <!-- 麻將鍵盤 -->
+            <div class="mahjong-keyboard">
+                <div class="keyboard-row" id="row-man">
+                    <div class="suit-label" style="color: #d32f2f">萬</div>
+                    <!-- 1-9萬 -->
+                </div>
+                <div class="keyboard-row" id="row-pin">
+                    <div class="suit-label" style="color: #1976d2">筒</div>
+                    <!-- 1-9筒 -->
+                </div>
+                <div class="keyboard-row" id="row-sou">
+                    <div class="suit-label" style="color: #388e3c">索</div>
+                    <!-- 1-9索 -->
+                </div>
+                <div class="keyboard-row" id="row-honors">
+                    <div class="suit-label" style="color: #333">字</div>
+                    <!-- 東南西北中發白 -->
+                </div>
+            </div>
+
+            <!-- 動作按鈕 -->
+            <div class="action-buttons">
+                <!-- 通用功能 -->
+                <button class="undo-btn" id="undoBtn">↩️ 撤銷</button>
+
+                <!-- 這裡的按鈕會根據當前狀態改變 -->
+                <div id="record-actions" class="action-group show">
+                    <span class="label">是誰打的？</span>
+                    <button class="player-select-btn" data-player="3">上家</button>
+                    <button class="player-select-btn" data-player="2">對家</button>
+                    <button class="player-select-btn" data-player="1">下家</button>
+                </div>
+                <div id="hand-actions" class="action-group">
+                    <button class="func-btn" id="drawBtn">🀄️ 我摸牌+1</button>
+                    <button class="func-btn" id="sortBtn">🔃 理牌</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定彈窗 -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h3>遊戲設定</h3>
+            <label>
+                <input type="radio" name="rule" value="16" checked> 台灣麻將 (16張)
+            </label>
+            <label>
+                <input type="radio" name="rule" value="13"> 香港/日本麻將 (13張)
+            </label>
+            <div class="modal-actions">
+                <button id="closeSettingsBtn">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
