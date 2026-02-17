@@ -76,6 +76,15 @@ const dom = {
 
 // --- 初始化 ---
 function init() {
+    // 確保 DOM 元素已獲取 (避開時序問題)
+    dom.opponents = [
+        null,
+        document.getElementById('player-1'),
+        document.getElementById('player-2'),
+        document.getElementById('player-3')
+    ];
+    console.log('Opponents loaded:', dom.opponents);
+
     initKeyboard();
     resetGame();
     attachEvents();

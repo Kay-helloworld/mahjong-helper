@@ -75,6 +75,14 @@ body {
     display: flex;
     flex-direction: column;
     background: rgba(0, 0, 0, 0.2);
+    /* 增加互動反饋 */
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.opponent:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .opponent.top {
