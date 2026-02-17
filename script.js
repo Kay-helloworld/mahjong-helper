@@ -58,7 +58,12 @@ const dom = {
         sou: document.getElementById('row-sou'),
         honors: document.getElementById('row-honors')
     },
-    playerSelectBtns: document.querySelectorAll('.player-select-btn'),
+    opponents: [
+        null, // 0:我 (無此元素)
+        document.getElementById('player-1'), // 下家
+        document.getElementById('player-2'), // 對家
+        document.getElementById('player-3')  // 上家
+    ],
     actionGroups: {
         record: document.getElementById('record-actions'),
         hand: document.getElementById('hand-actions')
@@ -429,11 +434,13 @@ function render() {
 }
 
 function updatePlayerSelect() {
-    dom.playerSelectBtns.forEach(btn => {
-        const pIdx = parseInt(btn.dataset.player);
-        if (pIdx === gameState.selectedPlayer) btn.classList.add('selected');
-        else btn.classList.remove('selected');
-    });
+    for (let i = 1; i <= 3; i++) {
+        const el = dom.opponents[i];
+        if (el) {
+            if (i === gameState.selectedPlayer && gameState.mode === 'record') el.classList.add('selected');
+            else el.classList.remove('selected');
+        }
+    }
 }
 
 function createTileHTML(tile, size = 'normal', interactable = false, playerIdx = null, tileIdx = null) {
@@ -491,13 +498,16 @@ function attachEvents() {
         btn.addEventListener('click', () => toggleMode(btn.dataset.mode));
     });
 
-    dom.playerSelectBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            gameState.selectedPlayer = parseInt(btn.dataset.player);
-            gameState.mode = 'record';
-            toggleMode('record');
-            render();
-        });
+    // 對手點擊 (上家/對家/下家)
+    [1, 2, 3].forEach(idx => {
+        if (dom.opponents[idx]) {
+            dom.opponents[idx].addEventListener('click', () => {
+                gameState.selectedPlayer = idx;
+                gameState.mode = 'record';
+                toggleMode('record');
+                render();
+            });
+        }
     });
 
     dom.drawBtn.addEventListener('click', drawTile);
@@ -514,6 +524,8 @@ function toggleMode(mode) {
 
     dom.actionGroups.record.classList.toggle('show', mode === 'record');
     dom.actionGroups.hand.classList.toggle('show', mode === 'hand');
+
+    updatePlayerSelect(); // 更新對手邊框
 
     if (mode === 'hand') showActionHint('請點選鍵盤，建立或添加手牌');
     else showActionHint(`正在記錄 ${gameState.selectedPlayer === 3 ? '上家' : gameState.selectedPlayer === 2 ? '對家' : '下家'} 的捨牌`);

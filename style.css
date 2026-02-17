@@ -334,17 +334,17 @@ body {
     /* 深綠字 */
 }
 
-.player-select-btn {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    background: #f9f9f9;
-    border-radius: 6px;
+/* 選中對手時的高亮樣式 */
+.opponent.selected {
+    border: 2px solid var(--accent-gold);
+    background: rgba(255, 215, 0, 0.2);
+    /* 金色背景 */
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
-.player-select-btn.selected {
-    background: var(--bg-primary);
-    color: white;
-    border-color: var(--bg-primary);
+/* 隱藏底部的玩家選擇按鈕 (因為現在直接點區塊了) */
+.player-select-btn {
+    display: none;
 }
 
 /* 隱藏 */
